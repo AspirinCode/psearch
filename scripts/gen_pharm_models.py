@@ -69,7 +69,6 @@ def gen_models(def_generator, df_0):
         dct['conf_id'].append(conf_id)
         dct['feature_ids'].append(','.join(map(str, labels)))
     df = pd.DataFrame(dct)
-    df = df.sort_values(by=['hash'], ascending=False)
     count_df = df.drop_duplicates(subset=['mol_name', 'hash'])
     count_df = count_df.groupby(['hash'], sort=True).size().reset_index(name='count')
     df = pd.merge(df, count_df, on='hash', how='right')
@@ -82,10 +81,10 @@ def load_pharmacophores(in_db, in_training_set):
     mol_names = [name.strip().split('\t')[0] for name in open(in_training_set).readlines()]
     confs_pharm = defaultdict(list)
     with sql.connect(in_db) as con:
+        cur = con.cursor()
+        cur.execute("SELECT bin_step FROM settings")
+        db_bin_step = cur.fetchone()[0]
         for mol_name in mol_names:
-            cur = con.cursor()
-            cur.execute("SELECT bin_step FROM settings")
-            db_bin_step = cur.fetchone()[0]
             cur.execute("SELECT conf_id, feature_label, x, y, z FROM feature_coords WHERE conf_id IN "
                         "(SELECT conf_id from conformers WHERE mol_name = ?)", (mol_name,))
             res = cur.fetchall()
