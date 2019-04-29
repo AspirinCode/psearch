@@ -116,7 +116,7 @@ def process_mol(mol, mol_name, smarts, bin_step, store_coords, multiconf, tolera
             output.append((mol_name, hash_md5, coords, fp_bin, pharm_obj))
         return output
     else:
-        p = Pharmacophore(bin_step, cached=True)
+        p = Pharmacophore(bin_step)
         if 'process_factory' in globals():
             p.load_from_feature_factory(mol, process_factory)
         elif smarts:

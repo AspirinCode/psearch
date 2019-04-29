@@ -92,7 +92,7 @@ def load_pharmacophores(in_db, in_training_set):
             for r in res:
                 confs[r[0]].append((r[1], tuple(r[2:])))  # dict(conf_id: (feature_label, x, y, z))
             for conf_id, coord in confs.items():
-                p = Pharmacophore(bin_step=db_bin_step, cached=True)
+                p = Pharmacophore(bin_step=db_bin_step)
                 p.load_from_feature_coords(coord)
                 confs_pharm['mol_name'].append(mol_name)
                 confs_pharm['conf_id'].append(conf_id)
@@ -186,7 +186,7 @@ def main(in_adb, in_indb, act_trainset, inact_trainset, out_pma, tolerance, lowe
                            df_sub_inact,
                            act_trainset, clust_strategy)
     if df.empty:
-        return None, 0
+        return 'no 4-points pharmacophore models above thresholds', 0
 
     if save_files:
         path_files = os.path.join(os.path.split(os.path.dirname(in_adb))[0], 'files')
@@ -237,7 +237,8 @@ if __name__ == '__main__':
                         help='txt file with information adout active models: '
                              'model, hash, stereo, nact, ninact, nact/ninact, conf_id, feature_ids')
     parser.add_argument('-o', '--output_path', metavar='output/path', required=False, default=None,
-                        help='output path ')
+                        help='output path to the models of pharmacophores. '
+                             'If None, the path will be generated automatically.')
     parser.add_argument('-tol', '--tolerance', default=0,
                         help='tolerance volume for the calculation of the stereo sign. If the volume of the '
                              'tetrahedron created by four points less than tolerance then those points are considered '
